@@ -18,7 +18,7 @@ public class Vector2D {
         this.y = y;
     }
        
-       // Accessors and Mutators
+    // Accessors and Mutators
     public double getX(){ return x; }
     public double getY(){ return y; }
     

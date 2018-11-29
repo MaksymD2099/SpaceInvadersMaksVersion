@@ -10,6 +10,7 @@ package spaceinvaders;
  * @author cstuser
  */
 public class SpaceShip_Main extends GameObject{
+   
     public SpaceShip_Main(Vector2D position, Vector2D velocity, double height, double width)
     {
         super(position, velocity, new Vector2D(0,0), height, width);
@@ -17,4 +18,6 @@ public class SpaceShip_Main extends GameObject{
         
       
     }
+    
+   
 }

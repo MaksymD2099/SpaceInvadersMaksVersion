@@ -29,6 +29,8 @@ public class AssetManager {
     static private ImagePattern projectileLaser;
     static private ImagePattern MainSpaceShip;
     static private ImagePattern shield;
+    static private ImagePattern explosion_alien;
+    static private ImagePattern explosion_proj_on_Shield;
     
     static private Media backgroundMusic = null;
     static private AudioClip ennemyHitSound = null;
@@ -62,14 +64,26 @@ public class AssetManager {
         
         shield = new ImagePattern(new Image(fileURL("./assets/images/shield.png")));
         
+        explosion_alien = new ImagePattern(new Image(fileURL("./assets/images/explosion_clear.gif")));
+        explosion_proj_on_Shield = new ImagePattern(new Image(fileURL("./assets/images/explosion_shield.gif")));
+        
            
         // Preload all music tracks
         backgroundMusic = new Media(fileURL("./assets/music/Bumblebee.mp3"));
         
          // Preload all sound effects
         shootingSound = new AudioClip(fileURL("./assets/soundfx/Laser_Gun.mp3"));
-        ennemyHitSound = new AudioClip(fileURL("./assets/soundfx/Plastic_on_Cement.mp3"));
+        ennemyHitSound = new AudioClip(fileURL("./assets/soundfx/hit.mp3"));
         
+    }
+    static public ImagePattern getExplosionAlien(){
+        
+        return explosion_alien;
+    }
+    
+    static public ImagePattern getExplosionOnShield()
+    {
+        return explosion_proj_on_Shield;
     }
     
     static public Background getBackgroundImage()
@@ -98,6 +112,11 @@ public class AssetManager {
     }
     
     static public AudioClip getEnnemyHitSound()
+    {
+        return ennemyHitSound;
+    }
+    
+    static public AudioClip getHitSound()
     {
         return ennemyHitSound;
     }

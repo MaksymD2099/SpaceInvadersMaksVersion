@@ -10,13 +10,17 @@ public class GameObject {
     private Vector2D position;
     private Vector2D velocity;
     private Vector2D acceleration;
+    private double height;
+    private double width;
     
     public GameObject(Vector2D position, Vector2D velocity, Vector2D acceleration, double height, double width)
     {
         this.position = position;
         this.velocity = velocity;
         this.acceleration = acceleration; 
-        
+        this.height = height;
+        this.width = width;
+              
         rectangle = new Rectangle(height, width);
         rectangle.setX(position.getX());
         rectangle.setY(position.getY());
@@ -73,5 +77,34 @@ public class GameObject {
 
     public Vector2D getAcceleration() {
         return acceleration;
+    }
+    
+    public double getRectangleHeight()
+    {
+        height = rectangle.getHeight();
+      
+        return height;
+    }
+    
+    public double getRectangleWidth()
+    {
+          width = rectangle.getWidth();
+          
+          return width;
+    }
+    
+  /*  public void setRectangleHeight(double height)
+    {
+        this.height = height;
+    }
+    
+     public void setRectangleWidth(double width)
+    {
+        this.width = width;
+    }*/
+    
+    public Rectangle getCoordinates()
+    {
+        return new Rectangle(position.getX(), position.getY(), getRectangleHeight() , getRectangleWidth());
     }
 }

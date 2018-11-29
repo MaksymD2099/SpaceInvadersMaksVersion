@@ -9,7 +9,7 @@ package spaceinvaders;
  *
  * @author cstuser
  */
-public class Enemies<Rectangle> extends GameObject{
+public class Enemies extends GameObject{
      public Enemies(Vector2D position, Vector2D velocity, double height, double width, int index)
     {
         super(position, velocity, new Vector2D(0,0), height, width, index);

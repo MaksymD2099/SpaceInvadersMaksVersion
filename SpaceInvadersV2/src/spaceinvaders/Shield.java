@@ -9,7 +9,7 @@ package spaceinvaders;
  *
  * @author cstuser
  */
-public class Shield<Rectangle> extends GameObject{
+public class Shield extends GameObject{
     public Shield(Vector2D position, double height, double width)
     {
         super(position,  new Vector2D(0,0), new Vector2D(0,0), height, width);

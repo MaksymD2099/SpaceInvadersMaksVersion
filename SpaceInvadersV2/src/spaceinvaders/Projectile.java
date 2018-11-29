@@ -9,10 +9,11 @@ package spaceinvaders;
  *
  * @author cstuser
  */
-public class Projectile extends GameObject{
+public class Projectile extends GameObject{   
     public Projectile(Vector2D position, Vector2D velocity, double height, double width)
     {
         super(position, velocity, new Vector2D(0,0), height, width);
         rectangle.setFill(AssetManager.getProjectileImage());
     }
+   
 }

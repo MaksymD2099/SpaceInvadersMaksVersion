@@ -15,6 +15,7 @@ import javafx.animation.AnimationTimer;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -22,6 +23,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.geometry.Rectangle2D;
 import javafx.util.Duration;
 
 
@@ -46,13 +49,15 @@ public class FXMLDocumentController implements Initializable {
     private double lastFrameTime = 0.0;
     
     private ArrayList<GameObject> objectList = new ArrayList<>();
-    private ArrayList<Projectile> projectileList = new ArrayList<>();
-    private Enemies[][] enemies = new Enemies[5][10];        
+    private ArrayList<Projectile> projectiles = new ArrayList<>();
+    private Enemies[][] enemies = new Enemies[5][9];        
     private ArrayList<Shield> shield = new ArrayList<>();
     private SpaceShip_Main SpaceShip = null;
    
     //Projectile number in the list
     int projectile_count = -1;
+    
+    boolean collison = false;
     
     public void addToPane(Node node)
     {
@@ -65,17 +70,20 @@ public class FXMLDocumentController implements Initializable {
     {      
       
       projectile_count++;
-      Vector2D init_position = SpaceShip.getPosition();
+      
+      //Center the Projectile
+      double prj_posX = SpaceShip.getPosition().getX() + 10;
+      double prj_posY = SpaceShip.getPosition().getY() + 50;
+      
+      Vector2D init_position = new Vector2D(prj_posX,prj_posY);
       Vector2D velocity = new Vector2D(0,-600);
      //velocity.normalize();
      //velocity = velocity.mult(PROJECTILE_SPEED);
       
-      
-      projectileList.add(new Projectile(init_position , velocity, 10, 30));      
-      addToPane(projectileList.get(projectile_count).getRectangle());     
-      objectList.add(projectileList.get(projectile_count));
-      
-      
+      AssetManager.getShootingSound().play();
+      projectiles.add(new Projectile(init_position, velocity, 10, 30));      
+      addToPane(projectiles.get(projectile_count).getRectangle());     
+      objectList.add(projectiles.get(projectile_count));    
     }
     
     
@@ -86,9 +94,9 @@ public class FXMLDocumentController implements Initializable {
         MouseXvalue.setText(x+ ""); //Debug
          
         SpaceShip.setPosition(new Vector2D(event.getX(),500));
-
     }
 
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
      lastFrameTime = 0.0f;
@@ -98,9 +106,9 @@ public class FXMLDocumentController implements Initializable {
      
     //Create and Initialize all objects
     SpaceShip = new SpaceShip_Main(new Vector2D(350,500),new Vector2D(0,0), 100, 100);  
-    shield.add(new Shield(new Vector2D( 70, 420), 120, 40));
-    shield.add(new Shield(new Vector2D( 370, 420), 120, 40));
-    shield.add(new Shield(new Vector2D( 670, 420), 120, 40));
+    shield.add(new Shield(new Vector2D( 70, 410), 120, 40));
+    shield.add(new Shield(new Vector2D( 370, 410), 120, 40));
+    shield.add(new Shield(new Vector2D( 670, 410), 120, 40));
     
     int x_pos = 10;
     int y_pos = 70;
@@ -114,8 +122,6 @@ public class FXMLDocumentController implements Initializable {
             }          
         }
 
-    
-    
     //Add background
     pane.setBackground(AssetManager.getBackgroundImage());
     
@@ -183,61 +189,63 @@ public class FXMLDocumentController implements Initializable {
             } 
         }
     //************
-        
     
-                /*
-                // Collision detection and response
-               for(int i=0; i<objectList.size(); i++)
-                {
-                    for (int j=i+1; j<objectList.size(); j++)
+ 
+                //Collison Shield/Projectile            
+                for (int i = 0; i < projectiles.size(); i++) {
+                    
+                  
+                    
+                    Rectangle prj_rec = projectiles.get(i).getRectangle();
+                    Bounds prj_rec_Bounds = prj_rec.getBoundsInParent();
+                    
+                    
+                    Rectangle shield_rec1 = shield.get(0).getRectangle();
+                    Bounds shield_rec_Bounds1 = shield_rec1.getBoundsInParent();
+                    
+                    Rectangle shield_rec2 = shield.get(1).getRectangle();
+                    Bounds shield_rec_Bounds2 = shield_rec2.getBoundsInParent();
+                    
+                    Rectangle shield_rec3 = shield.get(2).getRectangle();
+                    Bounds shield_rec_Bounds3 = shield_rec3.getBoundsInParent();
+                        
+                    if(prj_rec_Bounds.intersects(shield_rec_Bounds1) || prj_rec_Bounds.intersects(shield_rec_Bounds2) || prj_rec_Bounds.intersects(shield_rec_Bounds3))
                     {
-                        if (objectList.get(i) instanceof Planet && 
-                            objectList.get(i) instanceof Planet)
-                        {
-                            Circle circle1 = objectList.get(i).getCircle();
-                            Circle circle2 = objectList.get(j).getCircle();
+                      System.out.println("COLLISION");                    
+                      AssetManager.getEnnemyHitSound().play();
+                      //prj_rec.setFill(AssetManager.getExplosionOnShield());
+                      
+                    }
 
-                            Vector2D c1 = new Vector2D(circle1.getCenterX(), circle1.getCenterY());
-                            Vector2D c2 = new Vector2D(circle2.getCenterX(), circle2.getCenterY());
-
-                            Vector2D n = c2.sub(c1);
-                            double distance = n.magnitude();
-
-                            if (distance < circle1.getRadius() + circle2.getRadius())
-                            {
-                                // Compute normal and tangent vectors
-                                n.normalize();
-                                Vector2D t = new Vector2D(-n.getY(), n.getX());
-
-                                // Separate circles - Compute new positions and assign to circles
-                                double overlap = distance - (circle1.getRadius() + circle2.getRadius());
-                                c1 = c1.add(n.mult(overlap/2));
-                                c2 = c2.sub(n.mult(overlap/2));
-                                objectList.get(i).setPosition(c1);
-                                objectList.get(j).setPosition(c2);
-                                
-                                // Decompose velocities, project them on n and t
-                                Vector2D v1 = objectList.get(i).getVelocity();
-                                Vector2D v2 = objectList.get(j).getVelocity();
-
-                                Vector2D v1N = n.mult(v1.dot(n));
-                                Vector2D v2N = n.mult(v2.dot(n));
-
-                                Vector2D v1T = t.mult(v1.dot(t));
-                                Vector2D v2T = t.mult(v2.dot(t));
-
-                                // Change velocities
-                                v1.set(v1T.add(v2N));
-                                v2.set(v2T.add(v1N));                                
-                            }
+                }      
+                
+                
+                //Collision Projectile/Enemy
+                for (int i = 0; i < projectiles.size(); i++) {
+                    
+                    Rectangle prj_rec = projectiles.get(i).getRectangle();
+                    Bounds prj_rec_Bounds = prj_rec.getBoundsInParent();
+                    
+                    
+                    for (int j = 0; j < 4; j++) {
+                        for (int k = 0; k < 8; k++) {
                             
+                            Rectangle enemy_rec = enemies[j][k].getRectangle();
+                            Bounds enemy_rec_Bounds = enemy_rec.getBoundsInParent();
+                            
+                            if(prj_rec_Bounds.intersects(enemy_rec_Bounds))
+                            {
+                                System.out.println("COLLISION!!!!!!!!");
+                                prj_rec.setVisible(false);
+                                enemy_rec.setVisible(false);
+                            }
                         }
                     }
-                }*/
+                }
             }
-        }.start();      
-    }   
-
-   }    
+       }.start();      
+      }
+    }
+       
     
 
